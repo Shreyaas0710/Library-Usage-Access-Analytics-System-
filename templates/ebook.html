@@ -1,0 +1,572 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EBook Dashboard</title>
+    <link rel="stylesheet" href="{% static 'fonts/poppins.css' %}">
+    <link rel="stylesheet" href="{% static 'icons/font-awesome.min.css' %}">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --info: #0984e3;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .banner-container {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+        }
+
+        .banner-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 500;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--primary), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--info));
+            border-radius: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #00cec9 100%);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .search-box input {
+            padding: 0.5rem 1rem 0.5rem 2rem;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            position: relative;
+        }
+
+        th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            right: 0;
+            height: 50%;
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            background-color: white;
+        }
+
+        td:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            right: 0;
+            height: 50%;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(162, 155, 254, 0.1);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        #pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #pagination button {
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #pagination button:hover {
+            background: #f5f5f5;
+        }
+
+        #pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .banner-container {
+                height: 150px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="banner-container">
+            <img src="{% static 'images/IGCAR.jpg' %}" alt="IGCAR EBook Banner" class="banner-img" id="banner-image" />
+            <div class="banner-placeholder" id="banner-fallback" style="display: none;">IGCAR EBooks</div>
+        </div>
+
+        <header>
+            <h1>EBook Dashboard</h1>
+            <div class="header-buttons">
+                <a href="{% url 'analyze_ebook' %}" class="btn btn-success">
+                    <i class="fas fa-chart-bar"></i> Analyze
+                </a>
+            </div>
+        </header>
+
+        <div class="table-controls">
+            <div>
+                Show
+                <select id="rows-per-page">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                entries
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search..." />
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                     <tr>
+                         <th>S.No</th>
+                         <th>Title</th>
+                         <th>Author</th>
+                         <th>ISBN</th>
+                         <th>Subject</th>
+                         <th>Year</th>
+                         <th>Publisher</th>
+                     </tr>
+                </thead>
+                <tbody id="data-body">
+                    {% for book in ebooks %}
+                    <tr>
+                        <td>{{ book.sno }}</td>
+                        <td>{{ book.book_title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.isbn }}</td>
+                        <td>{{ book.english_name }}</td>
+                        <td>{{ book.year_of_publish }}</td>
+                        <td>{{ book.publisher_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-container">
+            <div class="pagination-info" id="pagination-info"></div>
+            <div id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bannerImg = document.getElementById('banner-image');
+            const fallback = document.getElementById('banner-fallback');
+
+            if (bannerImg.complete) {
+                if (bannerImg.naturalWidth === 0) {
+                    showFallback();
+                }
+            } else {
+                bannerImg.onerror = showFallback;
+            }
+
+            function showFallback() {
+                bannerImg.style.display = 'none';
+                fallback.style.display = 'flex';
+                if (window.location.protocol === 'file:') {
+                    fallback.innerHTML = `Image Not Loaded`;
+                }
+            }
+
+            const rowsPerPageSelect = document.getElementById('rows-per-page');
+            const searchInput = document.getElementById('search-input');
+            const pagination = document.getElementById('pagination');
+            const paginationInfo = document.getElementById('pagination-info');
+            const tableBody = document.getElementById('data-body');
+
+            const originalRows = Array.from(tableBody ? tableBody.querySelectorAll('tr') : []);
+
+            let filteredRows = [...originalRows];
+            let currentPage = 1;
+            let rowsPerPage = parseInt(rowsPerPageSelect.value);
+
+            // New getFilteredRows() function
+            function getFilteredRows() {
+                const query = searchInput.value.toLowerCase().trim();
+                const keywords = query.split(/\s+/);
+                if (keywords.length === 1 && keywords[0] === '') {
+                    // No search, return all
+                    return [...originalRows];
+                }
+                return originalRows.filter(row => {
+                    const text = Array.from(row.querySelectorAll('td'))
+                        .map(cell => cell.textContent.toLowerCase())
+                        .join(' ');
+                    return keywords.every(word => text.includes(word));
+                });
+            }
+
+            function filterRows() {
+                // Replace previous filtering logic with the new function
+                filteredRows = getFilteredRows();
+                currentPage = 1;
+                renderTable();
+            }
+
+            function renderTable() {
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const visibleRows = filteredRows.slice(start, end);
+                // Hide all rows
+                originalRows.forEach(row => (row.style.display = 'none'));
+                // Show only visible rows
+                visibleRows.forEach(row => (row.style.display = ''));
+                renderPagination(totalPages);
+                updatePaginationInfo();
+            }
+
+            function renderPagination(totalPages) {
+                // Clear existing buttons
+                pagination.innerHTML = '';
+
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '«';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTable();
+                    }
+                });
+                pagination.appendChild(prevBtn);
+
+                const maxVisibleButtons = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+                if (endPage - startPage + 1 < maxVisibleButtons) {
+                    startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+                }
+
+                // Show first page and ellipsis if needed
+                if (startPage > 1) {
+                    const firstBtn = document.createElement('button');
+                    firstBtn.innerText = '1';
+                    firstBtn.addEventListener('click', () => {
+                        currentPage = 1;
+                        renderTable();
+                    });
+                    pagination.appendChild(firstBtn);
+
+                    if (startPage > 2) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.innerText = '...';
+                        ellipsis.style.padding = '0.5rem';
+                        pagination.appendChild(ellipsis);
+                    }
+                }
+
+                // Page number buttons
+                for (let i = startPage; i <= endPage; i++) {
+                    const btn = document.createElement('button');
+                    btn.innerText = i;
+                    if (i === currentPage) btn.className = 'active';
+                    btn.addEventListener('click', () => {
+                        currentPage = i;
+                        renderTable();
+                    });
+                    pagination.appendChild(btn);
+                }
+
+                // Ellipsis and last page if needed
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.innerText = '...';
+                        ellipsis.style.padding = '0.5rem';
+                        pagination.appendChild(ellipsis);
+                    }
+
+                    const lastBtn = document.createElement('button');
+                    lastBtn.innerText = totalPages;
+                    lastBtn.addEventListener('click', () => {
+                        currentPage = totalPages;
+                        renderTable();
+                    });
+                    pagination.appendChild(lastBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '»';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTable();
+                    }
+                });
+                pagination.appendChild(nextBtn);
+            }
+
+            function updatePaginationInfo() {
+                const totalEntries = filteredRows.length;
+                const start = totalEntries === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+                const end = Math.min(currentPage * rowsPerPage, totalEntries);
+                const total = totalEntries;
+                if (total === 0) {
+                    document.getElementById('pagination-info').textContent = 'No entries to show.';
+                } else {
+                    document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${total} entries ${
+                        searchInput.value ? `(filtered from ${originalRows.length} total entries)` : ''
+                    }`;
+                }
+            }
+
+            // Event listeners
+            rowsPerPageSelect.addEventListener('change', () => {
+                rowsPerPage = parseInt(rowsPerPageSelect.value);
+                currentPage = 1;
+                renderTable();
+            });
+
+            searchInput.addEventListener('input', () => {
+                filterRows();
+            });
+
+            // Initialize table
+            renderTable();
+        });
+    </script>
+</body>
+</html>

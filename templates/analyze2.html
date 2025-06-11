@@ -1,0 +1,648 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analyze Book Dataset</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Orbitron:wght@600&display=swap');
+  </style>
+
+  <style>
+    :root {
+      --primary-color: #6c5ce7;
+      --secondary-color: #00cec9;
+      --accent-color: #fd79a8;
+      --dark-color: #2d3436;
+      --light-bg: #e3f0ff;
+      --light-primary: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --chart-bg: #f3fafd;
+      --border-color: #b3d8fd;
+      --shadow-color: rgba(0, 0, 0, 0.07);
+      --error-color: #d63031;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #e3f0ff 0%, #b3d8fd 100%);
+      color: var(--dark-color);
+      min-height: 100vh;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--primary-color);
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    input[type="date"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: #f3fafd;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      color: var(--dark-color);
+      transition: box-shadow 0.3s, border-color 0.3s;
+    }
+
+    input[type="date"]:focus,
+    select:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 8px rgba(0, 206, 201, 0.13);
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%232d3436' viewBox='0 0 24 24'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 2rem;
+      box-shadow: 0 4px 12px rgba(108, 92, 231, 0.13);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.18);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      background: linear-gradient(45deg, #b3d8fd, #e3f0ff);
+      color: #888;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #error-message {
+      color: var(--error-color);
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    #chart-container {
+      margin-top: 2rem;
+      background-color: var(--chart-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 0 20px rgba(179, 216, 253, 0.07);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+      height: 500px; /* fixed height for layout consistency */
+    }
+
+    #chart-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+      border-radius: 4px 4px 0 0;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .offline-notice {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: var(--error-color);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+
+    @media(max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      #chart-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Offline Notification -->
+  <div class="offline-notice" id="offline-notice">
+    You are currently offline. Some features may be limited.
+  </div>
+
+  <div class="container">
+    <h1>{{ dataset_name }}</h1>
+
+    <!-- Attribute Count Selector -->
+    <div class="form-group">
+      <label for="attribute-count">Number of Attributes to Visualize</label>
+      <select id="attribute-count">
+        {% for i in range_values %}
+          <option value="{{ i }}">{{ i }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Attribute Selectors will be dynamically added here -->
+    <div id="attribute-selectors"></div>
+
+    <!-- Filter by Year -->
+    <div class="form-group">
+      <label for="filter-year">Filter by Year</label>
+      <input type="number" id="filter-year" placeholder="e.g., 2020" min="1900" max="2100" />
+    </div>
+
+    <!-- Chart Type Selector -->
+    <div class="form-group">
+      <label for="chart-type">Select Chart Type</label>
+      <select id="chart-type">
+        <option value="bar">Bar</option>
+        <option value="line">Line</option>
+        <option value="pie">Pie</option>
+        <option value="doughnut">Doughnut</option>
+        <option value="radar">Radar</option>
+        <option value="polarArea">Polar Area</option>
+      </select>
+    </div>
+
+    <!-- Generate Button -->
+    <button id="generate-btn">Generate Visualization</button>
+
+    <!-- Error Message -->
+    <div id="error-message"></div>
+
+    <!-- Chart Container -->
+    <div id="chart-container">
+      <canvas id="chartCanvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Handle online/offline status
+    function updateOnlineStatus() {
+      const notice = document.getElementById('offline-notice');
+      if (!navigator.onLine) {
+        notice.style.display='block';
+        // Load cached data if available
+        if (localStorage.getItem('lastDataset')) {
+          const cached = JSON.parse(localStorage.getItem('lastDataset'));
+          renderChart(cached.data, cached.selectedFields, cached.chartType);
+        }
+      } else {
+        notice.style.display='none';
+      }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    // Initial check
+    updateOnlineStatus();
+
+    // Dataset fields including 'english_name'
+    const fields = [
+      {value: "sno", label: "Serial Number"},
+      {value: "book_title", label: "Title"},
+      {value: "author", label: "Author"},
+      {value: "isbn", label: "ISBN"},
+      {value: "year_of_publish", label: "Year"},
+      {value: "publisher_name", label: "Publisher"},
+      {value: "english_name", label: "Subject"}
+    ];
+
+    const datasetName = "Book Dataset";
+
+    const attributeCountSelect = document.getElementById('attribute-count');
+    const attributeSelectorsDiv = document.getElementById('attribute-selectors');
+    const generateBtn = document.getElementById('generate-btn');
+    const chartCanvas = document.getElementById('chartCanvas');
+    const errorMessage = document.getElementById('error-message');
+
+    let currentChart = null;
+
+    // Render attribute selectors based on count
+function renderAttributeSelectors(count) {
+  attributeSelectorsDiv.innerHTML = '';
+  errorMessage.textContent = '';
+
+  for (let i=0; i<count; i++) {
+    const group = document.createElement('div');
+    group.className='form-group';
+
+    const label = document.createElement('label');
+    label.textContent = `Attribute ${i+1}`;
+    group.appendChild(label);
+
+    const select = document.createElement('select');
+    select.id = `attribute-${i}`;
+    select.dataset.index = i;
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent='-- Select an attribute --';
+    select.appendChild(defaultOption);
+
+    // Populate options from fields array
+    fields.forEach(f => {
+      const option = document.createElement('option');
+      option.value = f.value;
+      option.textContent = f.label;
+      select.appendChild(option);
+    });
+
+    group.appendChild(select);
+    attributeSelectorsDiv.appendChild(group);
+  }
+}
+
+// Fetch and generate chart
+function generateChart() {
+  const count = parseInt(document.getElementById('attribute-count').value);
+  const selects = attributeSelectorsDiv.querySelectorAll('select');
+  const selectedFields = Array.from(selects).map(s => s.value);
+  const chartType = document.getElementById('chart-type').value;
+
+  // Validate selections
+  if (selectedFields.some(f => !f)) {
+    errorMessage.textContent='Please select all attributes.';
+    return;
+  }
+
+  // Gather filters
+  const filterYear = document.getElementById('filter-year').value.trim();
+
+  // Build API URL with parameters
+  const params = new URLSearchParams();
+  params.append('fields', selectedFields.join(','));
+
+  // Add dataset_type always (if needed)
+  params.append('dataset_type', 'ebook');
+
+  // Add year filter if provided
+  if (filterYear) {
+    // Validate year input (basic check)
+    if (!/^\d{4}$/.test(filterYear)) {
+      errorMessage.textContent='Please enter a valid 4-digit year.';
+      return;
+    }
+    params.append('year', filterYear);
+  }
+
+  const apiUrl = `/api/data/?${params.toString()}`;
+
+  // Debug: log the API URL
+  console.log('Fetching data from:', apiUrl);
+
+  // Fetch data
+  generateBtn.disabled=true;
+  generateBtn.textContent='Loading...';
+  errorMessage.textContent='';
+
+  fetch(apiUrl)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      // Debug: log the data received
+      console.log('Data received:', data);
+      // Cache for offline
+      localStorage.setItem('lastDataset', JSON.stringify({ data, selectedFields, chartType, filterYear }));
+      renderChart(data, selectedFields, chartType);
+    })
+    .catch(err => {
+      errorMessage.textContent='Error fetching data. See console for details.';
+      console.error('Fetch error:', err);
+    })
+    .finally(() => {
+      generateBtn.disabled=false;
+      generateBtn.textContent='Generate Visualization';
+    });
+}
+
+// Helper: Determine if a sample field looks like a date
+function getPotentialDateFields(sample) {
+  const dateFields = [];
+  if (!sample) return dateFields;
+  for (const key in sample) {
+    if (typeof sample[key] === 'string') {
+      const dateStr = sample[key];
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        // Check if string looks like a date format
+        if (dateStr.includes('T') || dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+          dateFields.push(key);
+        }
+      }
+    }
+  }
+  // Always consider 'year' attribute if exists
+  if (fields.some(f => f.value==='year_of_publish')) {
+    dateFields.push('year_of_publish');
+  }
+  // Also consider 'year' attribute if present
+  if (fields.some(f => f.value==='year')) {
+    dateFields.push('year');
+  }
+  return Array.from(new Set(dateFields));
+}
+
+// Main rendering function
+function renderChart(data, selectedFields, chartType) {
+  if (!data || data.length===0) {
+    errorMessage.textContent='No data available for the selected filters.';
+    if(currentChart) currentChart.destroy();
+    return;
+  }
+
+  // Destroy previous chart if any
+  if (currentChart) currentChart.destroy();
+
+  const ctx = chartCanvas.getContext('2d');
+
+  const sample = data[0];
+  const dateFields = getPotentialDateFields(sample);
+
+  let chartData;
+  let xAxisTitle='';
+  let yAxisTitle='';
+
+  // Handle different chart types
+  if (['pie','doughnut','polarArea'].includes(chartType)) {
+    if (selectedFields.length > 1) {
+      errorMessage.textContent='Select only one attribute for this chart.';
+      return;
+    }
+    const attr = selectedFields[0];
+    const values = data.map(item => item[attr]);
+    const labels = [...new Set(values)];
+    const counts = labels.map(l => values.filter(v => v===l).length);
+    chartData= {
+      labels,
+      datasets: [{
+        label: attr,
+        data: counts,
+        backgroundColor: labels.map((_,i) => `hsl(${i*360/labels.length},70%,70%)`),
+        borderColor: 'rgba(0,0,0,0.05)',
+        borderWidth:1
+      }]
+    };
+    xAxisTitle=attr;
+    yAxisTitle='Count';
+  } else if (chartType==='scatter') {
+    if (selectedFields.length!==2) {
+      errorMessage.textContent='Scatter plot requires exactly 2 attributes.';
+      return;
+    }
+    chartData= {
+      datasets:[{
+        label: `${selectedFields[0]} vs ${selectedFields[1]}`,
+        data: data.map(i => ({x: parseFloat(i[selectedFields[0]]), y: parseFloat(i[selectedFields[1]])})),
+        backgroundColor:'hsla(200,70%,70%,0.7)',
+        borderColor:'hsla(200,70%,40%,1)',
+        borderWidth:1
+      }]
+    };
+    xAxisTitle=selectedFields[0];
+    yAxisTitle=selectedFields[1];
+  } else if (selectedFields.length===2 && ['bar','line'].includes(chartType)) {
+    const [attr1, attr2]= selectedFields;
+    if (chartType==='bar') {
+      const countsMap={};
+      data.forEach(i => {
+        const key= i[attr1];
+        countsMap[key]= (countsMap[key]||0)+1;
+      });
+      const labels=Object.keys(countsMap);
+      const counts=Object.values(countsMap);
+      chartData= {
+        labels: labels.map(l => `${l}\nCount: ${countsMap[l]}`),
+        datasets:[{
+          label:`Count of ${attr1}`,
+          data:counts,
+          backgroundColor:'hsla(200,70%,70%,0.6)',
+          borderColor:'hsla(200,70%,40%,1)'
+        }]
+      };
+      xAxisTitle=attr1;
+      yAxisTitle=`Count of ${attr2}`;
+    } else if (chartType==='line') {
+      const groupMap={};
+      data.forEach(i => {
+        const key= i[attr1];
+        groupMap[key]= (groupMap[key]||0)+1;
+      });
+      const labels=Object.keys(groupMap);
+      const counts=Object.values(groupMap);
+      chartData= {
+        labels: labels.map(l => `${l}\nCount: ${groupMap[l]}`),
+        datasets:[{
+          label:`Count of ${attr1} (Total:${counts.reduce((a,b)=>a+b,0)})`,
+          data:counts,
+          backgroundColor:'hsla(200,70%,70%,0.2)',
+          borderColor:'hsla(200,70%,40%,1)',
+          fill:false
+        }]
+      };
+      xAxisTitle=attr1;
+      yAxisTitle=attr2;
+    }
+  } else {
+    // Default: count categories of first attribute
+    const attr= selectedFields[0];
+    const values= data.map(i=>i[attr]);
+    const labels= [...new Set(values)];
+    const counts= labels.map(l=>values.filter(v=>v===l).length);
+    chartData= {
+      labels: labels.map(l => `${l}\nCount: ${counts[labels.indexOf(l)]}`),
+      datasets:[{
+        label:`Count of ${attr}`,
+        data:counts,
+        backgroundColor: labels.map((_,i)=>`hsl(${i*360/labels.length},70%,70%)`),
+        borderColor:'rgba(0,0,0,0.05)'
+      }]
+    };
+    xAxisTitle=attr;
+    yAxisTitle='Count';
+  }
+
+  const config={
+    type: chartType,
+    data: chartData,
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:1500,easing:'easeInOutQuart'},
+      plugins:{
+        title:{
+          display:true,
+          text:`Visualization of ${selectedFields.join(' vs ')}`,
+          font:{size:18,family:'Orbitron'}
+        },
+        legend:{
+          position:'top',
+          labels:{color:'black',font:{family:'Montserrat',size:14}}
+        },
+        tooltip:{
+          callbacks:{
+            label:function(ctx){
+              const type= ctx.chart.config.type;
+              let label= ctx.label || '';
+              let count=0;
+              if(['pie','doughnut','polarArea'].includes(type)){
+                const index= ctx.dataIndex;
+                count= ctx.dataset.data[index];
+              } else if(type==='scatter'){
+                return '';
+              } else {
+                count= ctx.dataset.data[ctx.dataIndex];
+              }
+              return `${label}\nTotal: ${count}`;
+            }
+          }
+        }
+      },
+      scales: (function() {
+        if(chartType==='scatter'){
+          return {
+            x:{title:{display:true,text:xAxisTitle,font:{family:'Montserrat',size:14,weight:'bold'},color:'var(--dark-color)'},type:'linear'},
+            y:{title:{display:true,text:yAxisTitle,font:{family:'Montserrat',size:14,weight:'bold'},color:'var(--dark-color)'}}
+          };
+        } else {
+          return {
+            x:{title:{display:true,text:xAxisTitle,font:{family:'Montserrat',size:14,weight:'bold'},color:'var(--dark-color)'},grid:{color:'rgba(34,38,58,0.07)'},ticks:{color:'var(--dark-color)',font:{family:'Montserrat'}}},
+            y:{title:{display:true,text:yAxisTitle,font:{family:'Montserrat',size:14,weight:'bold'},color:'var(--dark-color)'},grid:{color:'rgba(34,38,58,0.07)'},ticks:{color:'var(--dark-color)',font:{family:'Montserrat'}},beginAtZero:true}
+          };
+        }
+      })()
+    }
+  };
+
+  if(currentChart) currentChart.destroy();
+  currentChart= new Chart(ctx,config);
+}
+
+// Generate demo data in offline mode
+function generateDemoData(fields){
+  const demo=[];
+  const count=15;
+  for(let i=0; i<count; i++){
+    const record={};
+    fields.forEach(f => {
+      const fname= f.toLowerCase();
+      if(fname.includes('date')){
+        const date= new Date();
+        date.setDate(date.getDate() - Math.floor(Math.random()*30));
+        record[f]= date.toISOString().split('T')[0];
+      } else if(fname.includes('name')){
+        const names=['X','Y','Z','Alpha','Beta'];
+        record[f]= names[Math.floor(Math.random()*names.length)];
+      } else if(fname.includes('id')){
+        record[f]= `ID-${1000+i}`;
+      } else if(f==='year_of_publish'){
+        record[f]=2000 + Math.floor(Math.random()*23);
+      } else if(f==='english_name'){
+        const englishNames=['Alpha','Bravo','Charlie','Delta','Echo'];
+        record[f]= englishNames[Math.floor(Math.random()*englishNames.length)];
+      } else {
+        record[f]= Math.floor(Math.random()*100)+1;
+      }
+    });
+    demo.push(record);
+  }
+  return demo;
+}
+
+// Event: Attribute count change
+document.getElementById('attribute-count').addEventListener('change', () => {
+  const count= parseInt(document.getElementById('attribute-count').value);
+  renderAttributeSelectors(count);
+});
+
+// Generate button click
+document.getElementById('generate-btn').addEventListener('click', generateChart);
+
+// Initialize attribute selectors
+renderAttributeSelectors(1);
+</script>
+</body>
+</html>
