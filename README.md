@@ -1,39 +1,45 @@
-# 📚 Library Management System  
+📚 Library Management System
 
-A **Django-based Library Management System** that allows librarians and students to efficiently manage books, members, and borrowing records.  
+A Library Management System built using the Django Framework, designed to manage books, users, borrowing, and returning of books efficiently.
 
----
+🚀 Features
 
-## 🚀 Features  
+📖 Manage books (add, update, delete, search)
 
-- 🔑 User authentication (Admin, Librarian, Student)  
-- 📖 Book management (Add, Update, Delete, Search)  
-- 👥 Member management  
-- 📅 Borrow & Return tracking with due dates  
-- ✅ Fine calculation for overdue books  
-- 🔍 Search and filter functionality  
-- 🖥️ Admin dashboard for overview  
+👤 User registration and authentication
 
----
+📚 Borrow and return books
 
-## 🛠️ Tech Stack  
+📊 Track issued and available books
 
-- **Backend:** Django (Python)  
-- **Database:** SQLite (default) / PostgreSQL / MySQL  
-- **Frontend:** Django Templates, Bootstrap  
-- **Other:** Django Admin Panel  
+🔒 Role-based access (Admin & Users)
 
----
+🕒 Due date tracking and fine calculation
 
-## 📂 Project Structure  
+🛠️ Tech Stack
 
-```bash
-library-management-system/
-│── library/               # Core Django app
-│── users/                 # User authentication and roles
-│── templates/             # HTML templates
-│── static/                # CSS, JS, Images
-│── db.sqlite3             # Default database
-│── manage.py              # Django project manager
-│── requirements.txt       # Dependencies
-│── README.md              # Project documentation
+Backend: Django (Python)
+
+Database: SQLite / PostgreSQL / MySQL
+
+Frontend: HTML, CSS, Bootstrap
+
+Authentication: Django’s built-in auth system
+
+⚙️ Installation
+
+Clone the repository
+
+git clone https://github.com/your-username/library-management.git
+cd library-management
+
+
+Create virtual environment
+
+python -m venv env
+source env/bin/activate   # On Windows: env\Scripts\activate
+
+
+Install dependencies
+
+pip i
