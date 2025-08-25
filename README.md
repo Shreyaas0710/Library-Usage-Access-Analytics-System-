@@ -1,45 +1,28 @@
-📚 Library Management System
+# 📚 Library Management System  
 
-A Library Management System built using the Django Framework, designed to manage books, users, borrowing, and returning of books efficiently.
+A **Django-based Library Management System** that helps librarians and students manage books, members, and borrowing records easily.  
 
-🚀 Features
+---
 
-📖 Manage books (add, update, delete, search)
+## 🚀 Features  
 
-👤 User registration and authentication
+- User authentication (Admin, Librarian, Student)  
+- Book management (Add, Update, Delete, Search)  
+- Member management  
+- Borrow & Return tracking with due dates  
+- Fine calculation for overdue books  
+- Admin dashboard for overview  
 
-📚 Borrow and return books
+---
 
-📊 Track issued and available books
+## 🛠️ Tech Stack  
 
-🔒 Role-based access (Admin & Users)
+- **Backend:** Django (Python)  
+- **Database:** SQLite (default), PostgreSQL, or MySQL  
+- **Frontend:** Django Templates + Bootstrap  
+- **Other:** Django Admin Panel  
 
-🕒 Due date tracking and fine calculation
+---
 
-🛠️ Tech Stack
+## 📂 Project Structure  
 
-Backend: Django (Python)
-
-Database: SQLite / PostgreSQL / MySQL
-
-Frontend: HTML, CSS, Bootstrap
-
-Authentication: Django’s built-in auth system
-
-⚙️ Installation
-
-Clone the repository
-
-git clone https://github.com/your-username/library-management.git
-cd library-management
-
-
-Create virtual environment
-
-python -m venv env
-source env/bin/activate   # On Windows: env\Scripts\activate
-
-
-Install dependencies
-
-pip i
