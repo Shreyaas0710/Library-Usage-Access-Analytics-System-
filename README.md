@@ -139,8 +139,6 @@ Displays **Library Usage Reports** with options for **Auditorium** and **Ebook R
 ### Ebook Dashboard  
 - Searchable eBook catalog with **title, author, year, publisher**.  
 
-*(Insert screenshots of your actual project UI here)*  
-
 ---
 
 ## 🚀 Future Scope  
